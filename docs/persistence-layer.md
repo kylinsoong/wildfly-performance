@@ -28,4 +28,28 @@ One fundamental cornerstone of database design is normalization. Its purpose is 
 
 #### 数据库的分块设计（Database partitioning）
 
-  
+另一个数据库设计的原则是数据的分块设计，例如当一个表中有数以亿计的数据条目时，就应该考虑分块设计的原则。通常数据库提供商就提供这种支持，但从数据库的设计角度，分块可以是水平分块和垂直分块。
+
+水平分块是将一个表分割成几个小表，如下图
+
+![ Horizontal partitioning of a database table](img/horizontal-partitioning.jpg)
+
+如上，我们将Event表水平分割成Event 2013和Event 2014，这样最大的优点是有利于查询操作，这样性能方面的优势是：
+
+* 查询速度快，和查询有数以亿计的数据条目的大表相比，查询一个小表性能有显著的提升
+
+* 消耗内存小，查询小表时索引占用内存小
+
+垂直分块是指根据列将大表分割成多个小表，分割后的每个小表和大表有同样多的行数。通常如果一个表中的某列为text或blob，我们可以考虑将其单独分割开，如下图为一垂直分块的示例：
+
+![Vertical partitioning of a database table](img/vertical-partitioning.jpg)
+
+如上，垂直分块好处有：
+
+* 查询速度加快，和分割前大表相比查询更精确
+
+* 应用层如果使用JPA/Hibernate映射配置，一对多关系懒加载可以提升性能。
+
+#### 使用索引
+
+ 
