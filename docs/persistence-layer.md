@@ -52,4 +52,64 @@ One fundamental cornerstone of database design is normalization. Its purpose is 
 
 #### 使用索引
 
- 
+使用索引的主要目的是加快查询，即数据库读速度。尽管索引是快速查询所不可缺少的，但是创建索引同样有一些缺陷，比如数据库表中某一行的更新都需要对相应的索引做更新，数据库表中新数据的插入都需要创建想对应的索引，这样索引带来的缺陷是影响数据库写操作，如下是一些创建使用索引的建议：
+
+* 最多四或五个索引，通常一张表最多创建的索引不要多于四或五个
+
+* 选择合适的列创建索引，比如WHERE查询所对应的列
+
+* 确保索引列为小数据，基于IO操作考虑，小的索引较容易处理，比如选择整数列创建索引
+
+* 选择数据唯一的列，创建索引的列不应该有多个相同的数据，索引列数据应该是唯一的
+
+* 组合索引列顺序，如果创建一个组合索引，列的顺序非常重要，选择数据唯一的列为第一列。
+
+通常为了研究索引是否创建的有效，许多数据库提供上支持一下分析方式，例如在PostgreSQL或Oracle数据库提供EXPLAIN来分析查询语句如下：
+
+~~~
+EXPLAIN SELECT * FROM product WHERE family=13; 
+~~~ 
+
+WildFly用户使用JPA/Hibernate可以创建索引，例如如下创建一组合索引：
+
+~~~
+@Table(appliesTo="tableName", indexes = {
+    @Index(name="index1",
+        columnNames={"column1","column2"})})
+~~~
+
+
+### JDBC 调优
+
+我们主要从以下三个方面去探讨JDBC 调优：
+
+* 使用数据库连接池多次使用创建的数据库连接
+
+* 确保使用合适的JDBC属性，例如选取合适的fetch size 和 batch size
+
+* 使用Prepared statement
+
+#### 数据库连接池
+
+连接池如何配置需要依赖相关的性能测试，根据性能测试结果配置适合自己的连接池属性。这里我们主要说WrappedConnectionJDK7，从编程API的角度去说，WildFly数据库连接池提供的数据库连接是对JDBC connection的一个封装org.jboss.jca.adapters.jdbc.jdk7.WrappedConnectionJDK7。
+
+配置datasource连接Oracle数据库，我们可以通过以下代码测试数据库连接：
+
+~~~
+Connection conn = datasource.getConnection();
+WrappedConnectionJDK7 wrappedConn = (WrappedConnectionJDK7)conn;
+Connection underlyingConn = wrappedConn.getUnderlyingConnection();
+OracleConnection oracleConn = (OracleConnection)underlyingConn;
+~~~
+
+#### 使用合适的JDBC fetch size 和 batch size
+
+The fetch size is the number of rows physically retrieved from the database at one time by the JDBC driver as you scroll through a ResultSet with the next() method. If you set the query fetch size to 100, when you retrieve the first row, the JDBC driver retrieves at once the first 100 rows (or all of them if fewer than 100 rows satisfy the query). When you retrieve the second row, the JDBC driver merely returns the row from the local memory; it doesn't have to retrieve that row from the database. This feature improves performance by reducing the number of calls (which are frequently network transmissions) to the database.
+
+To set the query fetch size, use the setFetchSize() method on the Statement (or PreparedStatement or CallableStatement) before execution. The optimal fetch size is not always obvious. Usually, a fetch size of one half or one quarter of the total expected result size is optimal. As a general rule, setting the query fetch size is mostly effective for a large result set. If you set the fetch size much larger than the number of rows retrieved, it's likely that you'll get a performance decrease, not an increase. The default value differs from different database vendors.
+
+In situations where you want to issue several inserts or updates in the same unit of work, update batching lets you to group those statements together and transmit them to the database as one set of instructions. Like setting the query fetch size, update batching works by reducing the number of network transmissions between the application and the database.
+
+#### 使用Prepared statement
+
+PreparedStatement ps = conn.prepareStatement("SELECT a,b FROM t WHERE c = ?");
