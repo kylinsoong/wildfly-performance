@@ -1,4 +1,8 @@
-### Connector 初始化
+### Connector 初始化开始过程
+
+如下图
+
+![JBoss Web/Tomcat Connetor init/start process](http-connector-JIoEndpoint.png)
 
 * Connector 可以是 HTTP Connector，也可以是 AJP Connector，Connector 中有 ProtocolHandler 和 Adapter 属性，Connector 初始化主要包括：初始化 Adapter，且将初始化的 Adapter 的 设定给 ProtocolHandler，然后调运 ProtocolHandler 的初始化方法，如下面代码段所示：
 
