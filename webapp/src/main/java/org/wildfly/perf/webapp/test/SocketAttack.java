@@ -1,4 +1,4 @@
-package com.kylin.webapp.servlet;
+package org.wildfly.perf.webapp.test;
 
 import java.io.IOException;
 import java.net.Socket;

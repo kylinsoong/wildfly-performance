@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.jboss.perf</groupId>
+	<artifactId>web-app-perf-test</artifactId>
+	<version>1.0</version>
+	<packaging>jar</packaging>
+	<name>web application</name>
+	<description>Web Application</description>
+
+	<url>https://github.com/kylinsoong</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<jboss.javaee6.spec.version>3.0.0.Final</jboss.javaee6.spec.version>
+
+		<compiler.plugin.version>2.3.1</compiler.plugin.version>
+		<war.plugin.version>2.1.1</war.plugin.version>
+
+		<maven.compiler.target>1.6</maven.compiler.target>
+		<maven.compiler.source>1.6</maven.compiler.source>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.jboss.spec</groupId>
+				<artifactId>jboss-javaee-6.0</artifactId>
+				<version>${jboss.javaee6.spec.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+	<dependency>
+		<groupId>org.jboss.web</groupId>
+		<artifactId>jbossweb</artifactId>
+		<version>7.2.2.Final-redhat-1</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.jboss.as</groupId>
+		<artifactId>jboss-as-web</artifactId>
+		<version>7.2.1.Final-redhat-10</version>
+		<scope>provided</scope>
+	</dependency>
+	
+
+	</dependencies>
+
+	<build>
+		<finalName>${artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${compiler.plugin.version}</version>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jboss.as.plugins</groupId>
+				<artifactId>jboss-as-maven-plugin</artifactId>
+				<version>7.3.Final</version>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
