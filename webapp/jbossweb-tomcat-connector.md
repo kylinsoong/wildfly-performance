@@ -178,5 +178,25 @@ JBoss Web 中关于max-connections 的定义如下
 注意，该 maxThreads 用来初始化内部的 workers 栈的大小。
 
 
+### JIoEndpoint 处理 Socket 请求
 
+Acceptor 线程（通常名字为 http-/127.0.0.1:8080-Acceptor-0）阻塞等待 Socket 连接，如下所示：
 
+~~~
+"http-/127.0.0.1:8080-Acceptor-0" daemon prio=10 tid=0x49ed5800 nid=0xbe9 runnable [0x49789000]
+   java.lang.Thread.State: RUNNABLE
+        at java.net.PlainSocketImpl.socketAccept(Native Method)
+        at java.net.AbstractPlainSocketImpl.accept(AbstractPlainSocketImpl.java:398)
+        at java.net.ServerSocket.implAccept(ServerSocket.java:522)
+        at java.net.ServerSocket.accept(ServerSocket.java:490)
+        at org.apache.tomcat.util.net.DefaultServerSocketFactory.acceptSocket(DefaultServerSocketFactory.java:61)
+        at org.apache.tomcat.util.net.JIoEndpoint$Acceptor.run(JIoEndpoint.java:309)
+        at java.lang.Thread.run(Thread.java:722)
+
+   Locked ownable synchronizers:
+        - None
+~~~
+
+JIoEndpoint 处理 Socket 请求如下图所示
+
+![JBossWeb/Tomcat BIO handle socket](http-connector-bio-handle-socket.png)
